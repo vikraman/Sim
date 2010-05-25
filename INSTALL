@@ -1,0 +1,10 @@
+Couldn't be easier:
+
+./configure
+make
+make install
+
+By default, this'l put the executable into /usr/local/bin
+To install to /usr/bin, use ./configure --prefix=/usr
+
+Note: You'll need the gtk+ libraries to build the program

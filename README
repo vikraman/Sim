@@ -1,0 +1,15 @@
+Introduction
+------------
+The game of Sim is played by two players on a board consisting of six dots ('vertices'). Each dot is connected to every other dot by a line. Two players take turns coloring any uncolored lines. One player colors in one color, and the other colors in another color, with each player trying to avoid the creation of a triangle made solely of their color; the player who completes such a triangle loses immediately.
+
+This program uses a heuristic strategy to play the game of Sim against an opponent. References to the algorithm can be found in the book :
+----------------------------------------------
+Mathematical Solitaires & Games
+By Benjamin L. Schwartz
+http://books.google.com/books?id=-Ce9vDK6UpUC
+----------------------------------------------
+
+For installation instructions, see INSTALL.
+For copying and (non-)warranty information, see COPYING.
+
+All files distributed under the GNU general public license.
