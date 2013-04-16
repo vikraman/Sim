@@ -3,7 +3,6 @@ module Main where
 import Control.Monad       (forM_, void)
 import Control.Monad.Trans (liftIO)
 
-import Graphics.Rendering.Cairo
 import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Builder
 
@@ -11,6 +10,8 @@ import Reactive.Banana.Frameworks
 import Reactive.Banana.Gtk
 
 import Paths_Sim
+import Sim.Board
+import Sim.Types
 
 main :: IO ()
 main = do
@@ -50,14 +51,3 @@ main = do
   actuate network
   widgetShowAll simWindow
   mainGUI
-
-drawBoard :: Double -> Double -> Render ()
-drawBoard w h = do
-  let r = 150
-  let t = pi/3
-  forM_ [1..6] $ \x -> do
-    arc (w/2 + r*sin (x*t)) (h/2 + r*cos (x*t)) 15 0 (2*pi)
-    stroke
-    moveTo (w/2 + r*sin(x*t) - 3) (h/2 + r*cos (x*t) + 3)
-    showText $ show $ floor x
-    newPath
