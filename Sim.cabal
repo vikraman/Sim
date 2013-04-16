@@ -16,3 +16,5 @@ executable sim
                , mtl
                , gtk
                , cairo
+               , reactive-banana == 0.7.*
+               , reactive-banana-gtk == 0.0.2

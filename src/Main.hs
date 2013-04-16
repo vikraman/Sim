@@ -7,6 +7,9 @@ import Graphics.Rendering.Cairo
 import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Builder
 
+import Reactive.Banana.Frameworks
+import Reactive.Banana.Gtk
+
 import Paths_Sim
 
 main :: IO ()
@@ -21,14 +24,10 @@ main = do
 
   simNewDialog <- builderGetObject builder castToDialog "simNewDialog"
   newGameImageMenuItem <- builderGetObject builder castToMenuItem "newGameImageMenuItem"
-  newGameImageMenuItem `on` menuItemActivate $ liftIO $ void (dialogRun simNewDialog)
-
   quitGameImageMenuItem <- builderGetObject builder castToMenuItem "quitGameImageMenuItem"
-  quitGameImageMenuItem `on` menuItemActivate $ liftIO mainQuit
 
   simAboutDialog <- builderGetObject builder castToDialog "simAboutDialog"
   aboutHelpImageMenuItem <- builderGetObject builder castToMenuItem "aboutHelpImageMenuItem"
-  aboutHelpImageMenuItem `on` menuItemActivate $ liftIO $ void (dialogRun simAboutDialog)
 
   simFrame <- builderGetObject builder castToFrame "simFrame"
   simCanvas <- drawingAreaNew
@@ -39,6 +38,16 @@ main = do
                                              drawBoard (fromIntegral w) (fromIntegral h)
                                            return False
 
+  network <- compile $ do
+    eNewGame <- event0 newGameImageMenuItem menuItemActivate
+    eQuitGame <- event0 quitGameImageMenuItem menuItemActivate
+    eAboutGame <- event0 aboutHelpImageMenuItem menuItemActivate
+
+    reactimate $ fmap (const $ void $ dialogRun simNewDialog) eNewGame
+    reactimate $ fmap (const $ mainQuit) eQuitGame
+    reactimate $ fmap (const $ void $ dialogRun simAboutDialog) eAboutGame
+
+  actuate network
   widgetShowAll simWindow
   mainGUI
 
