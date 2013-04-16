@@ -1,4 +1,4 @@
 language: haskell
 before_install:
-  - git clone git@github.com:conklech/reactive-banana-gtk.git
+  - git clone git://github.com/conklech/reactive-banana-gtk.git
   - cabal install ./reactive-banana-gtk
