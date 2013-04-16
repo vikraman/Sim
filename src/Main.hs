@@ -36,7 +36,7 @@ main = do
   simCanvas `on` exposeEvent $ liftIO $ do (w, h) <- widgetGetSize simCanvas
                                            simDrawing <- widgetGetDrawWindow simCanvas
                                            renderWithDrawable simDrawing $
-                                             drawBoard (fromIntegral w) (fromIntegral h)
+                                             drawBoard (fromIntegral w, fromIntegral h)
                                            return False
 
   network <- compile $ do
