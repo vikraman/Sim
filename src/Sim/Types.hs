@@ -31,7 +31,7 @@ data Player = Player { playerName :: Text
                      , playerId   :: PlayerId
                      , curMoves   :: [Move]
                      , validMoves :: [Move]
-                     , makeMove   :: Player -> Move -> Player
+                     , makeMove   :: Board -> Player -> Move -> Board
                      }
             deriving (Show)
 

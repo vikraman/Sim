@@ -57,7 +57,10 @@ main = do
                                                 return True
                                            return True
 
-  timeoutAdd ((readIORef board >>= print . status) >> return True) 1000
+  timeoutAdd ((do b <- readIORef board
+                  print $ validMoves $ playerA b
+                  print $ validMoves $ playerB b
+              ) >> return True) 5000
 
   network <- compile $ do
     eNewGame <- event0 newGameImageMenuItem menuItemActivate

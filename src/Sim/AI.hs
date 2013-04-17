@@ -1,4 +1,7 @@
-module Sim.AI (play) where
+module Sim.AI
+       ( play
+       , curMove
+       ) where
 
 import Data.List
 import Sim.Types
@@ -71,4 +74,3 @@ moveaux :: Move -> Move -> [Move] -> [Move]
 moveaux _ _ [] = []
 moveaux l1@(Line a b) l2@(Line p q) (l3@(Line r s):xs) = if (((b==p) && (a==s)  && (q==r)) || ((b==p) && (a==r)  && (q==s)) || ((b==q) && (a==s)  && (p==r)) || ((b==q) && (a==r) && (p==s)) ||  ((b==r) && (a==p)  && (q==s)) || ((b==r) && (a==q)  && (p==s)) || ((b==s) && (a==p)  && (q==r)) || ((b==s) && (a==q)  && (p==r))) then [l2,l3]
                                                                                                                                                                                                                                                                 else moveaux l1 l2 xs
-
