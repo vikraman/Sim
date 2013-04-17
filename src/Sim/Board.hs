@@ -19,7 +19,7 @@ vertex (w, h) x = (w/2 + radius*sin (x'*theta), h/2 + radius*cos (x'*theta))
   where x' = fromIntegral x
 
 drawBoard :: Dim -> Render ()
-drawBoard d@(w, h) = do
+drawBoard d@(w, h) =
   forM_ (map fromEnum $ enumFrom One) $ \x -> do
     let (p, q) = vertex d x
     arc p q 15 0 (2*pi)

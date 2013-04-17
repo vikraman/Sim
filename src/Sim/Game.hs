@@ -25,7 +25,7 @@ mkPlayer name pid = Player name pid [] initMoves mkMove
 mkMove :: Player -> Move -> Player
 mkMove p m@(Line x y) =
   p { validMoves = delete m $ validMoves p
-    , curMoves = m : (curMoves p)
+    , curMoves = m : curMoves p
     }
 
 handleInput :: DrawingArea -> Vertex -> Board -> IO Board

@@ -2,7 +2,7 @@
 
 module Main where
 
-import Control.Monad       (forM_, void)
+import Control.Monad       (forM_, void, when)
 import Control.Monad.Trans (liftIO)
 import Data.IORef
 
@@ -49,12 +49,11 @@ main = do
                                              drawBoard (fromIntegral w, fromIntegral h)
                                            simFrame `on` keyPressEvent $
                                              do key <- eventKeyName
-                                                if elem key $ map show [1..6]
-                                                  then do let v = toEnum ((read key :: Int) - 1) :: Vertex
-                                                          board' <- liftIO $ readIORef board
-                                                          board'' <- liftIO $ handleInput simCanvas v board'
-                                                          liftIO $ writeIORef board board''
-                                                  else return ()
+                                                when (elem key $ map show [1..6]) $
+                                                  do let v = toEnum ((read key :: Int) - 1) :: Vertex
+                                                     board' <- liftIO $ readIORef board
+                                                     board'' <- liftIO $ handleInput simCanvas v board'
+                                                     liftIO $ writeIORef board board''
                                                 return True
                                            return True
 
@@ -66,7 +65,7 @@ main = do
     eAboutGame <- event0 aboutHelpImageMenuItem menuItemActivate
 
     reactimate $ fmap (const $ void $ dialogRun simNewDialog) eNewGame
-    reactimate $ fmap (const $ mainQuit) eQuitGame
+    reactimate $ fmap (const mainQuit) eQuitGame
     reactimate $ fmap (const $ void $ dialogRun simAboutDialog) eAboutGame
 
   actuate network
