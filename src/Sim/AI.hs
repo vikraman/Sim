@@ -49,15 +49,26 @@ computene a1 (x:xs) = do if (triangle x a1) then 1+(computene a1 xs)
 
 triangle :: Move -> [Move] -> Bool
 triangle curmove [] = False
-triangle curmove (x:xs) | formtri curmove x = if (formtri2 curmove xs) then True
-                                                                       else triangle curmove xs
+triangle curmove (x:xs) | formtri curmove x = if (formtri2 curmove x xs) then True
+                                                                         else triangle curmove xs
                         | otherwise = triangle curmove xs
 
-formtri2 :: Move -> [Move] -> Bool
-formtri2 curmove [] = False
-formtri2 curmove (x:xs) | formtri curmove x = True
-                        | otherwise = formtri2 curmove xs
+formtri2 :: Move -> Move -> [Move] -> Bool
+formtri2 curmove _ [] = False
+formtri2 curmove@(Line a b) (Line p q) ((Line r s):xs) = if (((b==p) && (a==s)  && (q==r)) || ((b==p) && (a==r)  && (q==s)) || ((b==q) && (a==s)  && (p==r)) || ((b==q) && (a==r) && (p==s)) || ((b==r) && (a==p)  && (q==s)) || ((b==r) && (a==q)  && (p==s)) || ((b==s) && (a==p)  && (q==r)) || ((b==s) && (a==q)  && (p==r)))then  True
+                                                                                                                                                                                                                                                                else formtri2 curmove (Line p q) xs
 
 formtri :: Move -> Move -> Bool
 formtri (Line p q) (Line r s) | (p==r) || (p==s) || (q==r) || (q==s) = True
                               | otherwise = False
+
+curMove :: Move -> [Move] -> [Move]
+curMove mov [] = []
+curMove curmove (x:xs) | formtri curmove x = moveaux curmove x xs
+                       | otherwise = curMove curmove xs
+
+moveaux :: Move -> Move -> [Move] -> [Move]
+moveaux _ _ [] = []
+moveaux l1@(Line a b) l2@(Line p q) (l3@(Line r s):xs) = if (((b==p) && (a==s)  && (q==r)) || ((b==p) && (a==r)  && (q==s)) || ((b==q) && (a==s)  && (p==r)) || ((b==q) && (a==r) && (p==s)) ||  ((b==r) && (a==p)  && (q==s)) || ((b==r) && (a==q)  && (p==s)) || ((b==s) && (a==p)  && (q==r)) || ((b==s) && (a==q)  && (p==r))) then [l2,l3]
+                                                                                                                                                                                                                                                                else moveaux l1 l2 xs
+
