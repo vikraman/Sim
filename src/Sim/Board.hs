@@ -1,5 +1,6 @@
 module Sim.Board
        ( drawBoard
+       , drawMove
        ) where
 
 import Control.Monad            (forM_)
@@ -19,12 +20,12 @@ vertex (w, h) x = (w/2 + radius*sin (x'*theta), h/2 + radius*cos (x'*theta))
 
 drawBoard :: Dim -> Render ()
 drawBoard d@(w, h) = do
-  forM_ [1..6] $ \x -> do
+  forM_ (map fromEnum $ enumFrom One) $ \x -> do
     let (p, q) = vertex d x
     arc p q 15 0 (2*pi)
     stroke
     moveTo (p - 3) (q + 3)
-    showText $ show x
+    showText $ show $ x + 1
     newPath
 
 drawMove :: Dim -> Player -> Move -> Render ()
@@ -36,3 +37,4 @@ drawMove d@(w, h) p (Line v1 v2) = do
     A -> setSourceRGB 1 0 0
     B -> setSourceRGB 0 0 1
   lineTo x2 y2
+  stroke

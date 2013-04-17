@@ -1,7 +1,10 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Main where
 
 import Control.Monad       (forM_, void)
 import Control.Monad.Trans (liftIO)
+import Data.IORef
 
 import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Builder
@@ -11,6 +14,7 @@ import Reactive.Banana.Gtk
 
 import Paths_Sim
 import Sim.Board
+import Sim.Game
 import Sim.Types
 
 main :: IO ()
@@ -31,13 +35,30 @@ main = do
   aboutHelpImageMenuItem <- builderGetObject builder castToMenuItem "aboutHelpImageMenuItem"
 
   simFrame <- builderGetObject builder castToFrame "simFrame"
+  widgetSetCanFocus simFrame True
   simCanvas <- drawingAreaNew
   containerAdd simFrame simCanvas
-  simCanvas `on` exposeEvent $ liftIO $ do (w, h) <- widgetGetSize simCanvas
+
+  let a = mkPlayer "Player A" A
+  let b = mkPlayer "Player B" B
+  board <- newIORef $ Board a b MoveA
+
+  simCanvas `on` exposeEvent $ liftIO $ do d@(w, h) <- widgetGetSize simCanvas
                                            simDrawing <- widgetGetDrawWindow simCanvas
                                            renderWithDrawable simDrawing $
                                              drawBoard (fromIntegral w, fromIntegral h)
-                                           return False
+                                           simFrame `on` keyPressEvent $
+                                             do key <- eventKeyName
+                                                if elem key $ map show [1..6]
+                                                  then do let v = toEnum ((read key :: Int) - 1) :: Vertex
+                                                          board' <- liftIO $ readIORef board
+                                                          board'' <- liftIO $ handleInput simCanvas v board'
+                                                          liftIO $ writeIORef board board''
+                                                  else return ()
+                                                return True
+                                           return True
+
+  timeoutAdd ((readIORef board >>= print . status) >> return True) 1000
 
   network <- compile $ do
     eNewGame <- event0 newGameImageMenuItem menuItemActivate

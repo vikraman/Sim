@@ -1,7 +1,9 @@
 module Sim.Types
        ( Board(..)
+       , Status(..)
        , Player(..)
        , Move(..)
+       , Vertex(..)
        , PlayerId(..)
        , Dim
        ) where
@@ -18,18 +20,18 @@ data Board = Board { playerA :: Player
 type Dim = (Double, Double)
 
 data Status = MoveA
-            | HalfMoveA
+            | HalfMoveA Vertex
             | MoveB
-            | HalfMoveB
+            | HalfMoveB Vertex
             | WinA
             | WinB
-            deriving (Enum, Eq, Show)
+            deriving (Eq, Show)
 
 data Player = Player { playerName :: Text
                      , playerId   :: PlayerId
                      , curMoves   :: [Move]
                      , validMoves :: [Move]
-                     , makeMove   :: Move -> Player
+                     , makeMove   :: Player -> Move -> Player
                      }
             deriving (Show)
 
