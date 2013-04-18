@@ -54,19 +54,21 @@ mkMove b p m@(Line x y) =  b { playerA = pA'
         pA' =
           case playerId p of
             A -> pA { curMoves = curMoves'
-                    , validMoves = updateValidMoves curMoves' $ validMoves pA
+                    , validMoves = updateValidMoves curMoves' validMoves'
                     }
-              where curMoves' = m : curMoves pA
-            B -> pA { validMoves = deleteMove m $ validMoves pA
+            B -> pA { validMoves = validMoves'
                     }
+          where curMoves' = m : curMoves pA
+                validMoves' = deleteMove m $ validMoves pA
         pB' =
           case playerId p of
-            A -> pB { validMoves = deleteMove m $ validMoves pB
+            A -> pB { validMoves = validMoves'
                     }
             B -> pB { curMoves = curMoves'
-                    , validMoves = updateValidMoves curMoves' $ validMoves pB
+                    , validMoves = updateValidMoves curMoves' validMoves'
                     }
-              where curMoves' = m : curMoves pB
+          where curMoves' = m : curMoves pB
+                validMoves' = deleteMove m $ validMoves pB
 
 renderMove :: DrawingArea -> Player -> Move -> IO ()
 renderMove canvas p m  = do (w, h) <- widgetGetSize canvas
