@@ -32,8 +32,8 @@ mkPlayer name pid pt = Player name pid pt [] initMoves
 isValidMove :: Move -> Player -> Bool
 isValidMove = (. validMoves) . elem
 
-isWinning :: Player -> Bool
-isWinning = null . validMoves
+isLosing :: Player -> Bool
+isLosing = null . validMoves
 
 deleteMove :: Move -> [Move] -> [Move]
 deleteMove = delete
@@ -79,14 +79,34 @@ renderMove canvas p m  = do (w, h) <- widgetGetSize canvas
 gameLoop :: DrawingArea -> Vertex -> Board -> IO Board
 gameLoop canvas v b =
   case status b of
-    MoveA -> return b { status = HalfMoveA v }
-    MoveB -> return b { status = HalfMoveB v }
+    MoveA -> do
+      let pA = playerA b
+      let pB = playerB b
+      case playerType pA of
+        Human -> return b { status = HalfMoveA v }
+        Computer -> do let m = play pA pB MoveA
+                       renderMove canvas pA m
+                       let b' = mkMove b pA m
+                       return $ if isLosing $ playerA b'
+                                then b' { status = WinB }
+                                else b' { status = MoveB }
+    MoveB -> do
+      let pA = playerA b
+      let pB = playerB b
+      case playerType pB of
+        Human -> return b { status = HalfMoveB v }
+        Computer -> do let m = play pB pA MoveB
+                       renderMove canvas pB m
+                       let b' = mkMove b pB m
+                       return $ if isLosing $ playerB b'
+                                then b' { status = WinA }
+                                else b' { status = MoveA }
     HalfMoveA v' -> do let p = playerA b
                        let m = toMove v v'
                        if isValidMove m p
                          then do renderMove canvas p m
                                  let b' = mkMove b p m
-                                 return $ if isWinning $ playerA b'
+                                 return $ if isLosing $ playerA b'
                                           then b' { status = WinB }
                                           else b' { status = MoveB }
                          else return b { status = MoveA }
@@ -95,7 +115,7 @@ gameLoop canvas v b =
                        if isValidMove m p
                          then do renderMove canvas p m
                                  let b' = mkMove b p m
-                                 return $ if isWinning $ playerB b'
+                                 return $ if isLosing $ playerB b'
                                           then b' { status = WinA }
                                           else b' { status = MoveA }
                          else return b { status = MoveB }

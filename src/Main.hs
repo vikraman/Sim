@@ -39,7 +39,7 @@ main = do
   simCanvas <- drawingAreaNew
   containerAdd simFrame simCanvas
 
-  let a = mkPlayer "Player A" A Human
+  let a = mkPlayer "Player A" A Computer
   let b = mkPlayer "Player B" B Human
   board <- newIORef $ Board a b MoveA
 
