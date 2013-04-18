@@ -11,6 +11,7 @@ import qualified Data.Text  as T
 import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Builder
 
+import Reactive.Banana
 import Reactive.Banana.Frameworks
 import Reactive.Banana.Gtk
 
@@ -72,9 +73,9 @@ main = do
     eQuitGame <- event0 quitGameImageMenuItem menuItemActivate
     eAboutGame <- event0 aboutHelpImageMenuItem menuItemActivate
 
-    reactimate $ fmap (const $ void $ dialogRun simNewDialog) eNewGame
-    reactimate $ fmap (const mainQuit) eQuitGame
-    reactimate $ fmap (const $ void $ dialogRun simAboutDialog) eAboutGame
+    reactimate $ void (dialogRun simNewDialog) <$ eNewGame
+    reactimate $ mainQuit <$ eQuitGame
+    reactimate $ void (dialogRun simAboutDialog) <$ eAboutGame
 
   actuate network
   widgetShowAll simWindow
