@@ -39,8 +39,8 @@ main = do
   simCanvas <- drawingAreaNew
   containerAdd simFrame simCanvas
 
-  let a = mkPlayer "Player A" A
-  let b = mkPlayer "Player B" B
+  let a = mkPlayer "Player A" A Human
+  let b = mkPlayer "Player B" B Human
   board <- newIORef $ Board a b MoveA
 
   simCanvas `on` exposeEvent $ liftIO $ do d@(w, h) <- widgetGetSize simCanvas
@@ -52,7 +52,7 @@ main = do
                                                 when (elem key $ map show [1..6]) $
                                                   do let v = toEnum ((read key :: Int) - 1) :: Vertex
                                                      board' <- liftIO $ readIORef board
-                                                     board'' <- liftIO $ handleInput simCanvas v board'
+                                                     board'' <- liftIO $ gameLoop simCanvas v board'
                                                      liftIO $ writeIORef board board''
                                                 return True
                                            return True

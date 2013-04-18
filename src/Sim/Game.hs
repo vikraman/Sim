@@ -1,6 +1,8 @@
 module Sim.Game
        ( mkPlayer
-       , handleInput
+       , gameLoop
+       , initMoves
+       , updateValidMoves
        ) where
 
 import           Control.Monad.Trans (liftIO)
@@ -19,8 +21,13 @@ initMoves = [ Line x y
             , x /= y
             ]
 
-mkPlayer :: T.Text -> PlayerId -> Player
-mkPlayer name pid = Player name pid [] initMoves mkMove
+toMove :: Vertex -> Vertex -> Move
+toMove v v' = if v < v'
+              then Line v v'
+              else Line v' v
+
+mkPlayer :: T.Text -> PlayerId -> PlayerType -> Player
+mkPlayer name pid pt = Player name pid pt [] initMoves
 
 isValidMove :: Move -> Player -> Bool
 isValidMove = (. validMoves) . elem
@@ -31,8 +38,12 @@ isWinning = null . validMoves
 deleteMove :: Move -> [Move] -> [Move]
 deleteMove = delete
 
-updateValidMoves :: Move -> [Move] -> [Move]
-updateValidMoves m vms = foldr deleteMove vms $ m : curMove m vms
+updateValidMoves :: [Move] -> [Move] -> [Move]
+updateValidMoves cms vms = foldr (\m vms ->
+                                   if triangle m cms
+                                   then delete m vms
+                                   else vms
+                                 ) vms vms
 
 mkMove :: Board -> Player -> Move -> Board
 mkMove b p m@(Line x y) =  b { playerA = pA'
@@ -42,18 +53,20 @@ mkMove b p m@(Line x y) =  b { playerA = pA'
         pB  = playerB b
         pA' =
           case playerId p of
-            A -> pA { curMoves = m : curMoves pA
-                    , validMoves = updateValidMoves m $ validMoves pA
+            A -> pA { curMoves = curMoves'
+                    , validMoves = updateValidMoves curMoves' $ validMoves pA
                     }
+              where curMoves' = m : curMoves pA
             B -> pA { validMoves = deleteMove m $ validMoves pA
                     }
         pB' =
           case playerId p of
             A -> pB { validMoves = deleteMove m $ validMoves pB
                     }
-            B -> pB { curMoves = m : curMoves pB
-                    , validMoves = updateValidMoves m $ validMoves pB
+            B -> pB { curMoves = curMoves'
+                    , validMoves = updateValidMoves curMoves' $ validMoves pB
                     }
+              where curMoves' = m : curMoves pB
 
 renderMove :: DrawingArea -> Player -> Move -> IO ()
 renderMove canvas p m  = do (w, h) <- widgetGetSize canvas
@@ -61,13 +74,13 @@ renderMove canvas p m  = do (w, h) <- widgetGetSize canvas
                             renderWithDrawable drawing $
                               drawMove (fromIntegral w, fromIntegral h) p m
 
-handleInput :: DrawingArea -> Vertex -> Board -> IO Board
-handleInput canvas v b =
+gameLoop :: DrawingArea -> Vertex -> Board -> IO Board
+gameLoop canvas v b =
   case status b of
     MoveA -> return b { status = HalfMoveA v }
     MoveB -> return b { status = HalfMoveB v }
     HalfMoveA v' -> do let p = playerA b
-                       let m = Line v v'
+                       let m = toMove v v'
                        if isValidMove m p
                          then do renderMove canvas p m
                                  let b' = mkMove b p m
@@ -76,7 +89,7 @@ handleInput canvas v b =
                                           else b' { status = MoveB }
                          else return b { status = MoveA }
     HalfMoveB v' -> do let p = playerB b
-                       let m = Line v v'
+                       let m = toMove v v'
                        if isValidMove m p
                          then do renderMove canvas p m
                                  let b' = mkMove b p m

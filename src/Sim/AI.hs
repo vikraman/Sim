@@ -1,6 +1,6 @@
 module Sim.AI
        ( play
-       , curMove
+       , triangle
        ) where
 
 import Data.List

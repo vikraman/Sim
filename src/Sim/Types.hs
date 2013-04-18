@@ -5,6 +5,7 @@ module Sim.Types
        , Move(..)
        , Vertex(..)
        , PlayerId(..)
+       , PlayerType(..)
        , Dim
        ) where
 
@@ -29,14 +30,17 @@ data Status = MoveA
 
 data Player = Player { playerName :: Text
                      , playerId   :: PlayerId
+                     , playerType :: PlayerType
                      , curMoves   :: [Move]
                      , validMoves :: [Move]
-                     , makeMove   :: Board -> Player -> Move -> Board
                      }
             deriving (Show)
 
 data PlayerId = A | B
               deriving (Enum, Eq, Show)
+
+data PlayerType = Human | Computer | Network
+                deriving (Enum, Eq, Show)
 
 data Move = Line Vertex Vertex
           deriving (Show)
@@ -52,4 +56,4 @@ data Vertex = One
             | Four
             | Five
             | Six
-            deriving (Enum, Eq, Show)
+            deriving (Enum, Eq, Ord, Show)
