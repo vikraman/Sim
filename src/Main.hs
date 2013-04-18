@@ -4,7 +4,9 @@ module Main where
 
 import Control.Monad       (forM_, void, when)
 import Control.Monad.Trans (liftIO)
-import Data.IORef
+
+import           Data.IORef
+import qualified Data.Text  as T
 
 import Graphics.UI.Gtk
 import Graphics.UI.Gtk.Builder
@@ -34,12 +36,14 @@ main = do
   simAboutDialog <- builderGetObject builder castToDialog "simAboutDialog"
   aboutHelpImageMenuItem <- builderGetObject builder castToMenuItem "aboutHelpImageMenuItem"
 
+  simStatusBar <- builderGetObject builder castToStatusbar "simStatusBar"
+
   simFrame <- builderGetObject builder castToFrame "simFrame"
   widgetSetCanFocus simFrame True
   simCanvas <- drawingAreaNew
   containerAdd simFrame simCanvas
 
-  let a = mkPlayer "Player A" A Computer
+  let a = mkPlayer "Player A" A Human
   let b = mkPlayer "Player B" B Human
   board <- newIORef $ Board a b MoveA
 
@@ -57,10 +61,11 @@ main = do
                                                 return True
                                            return True
 
-  timeoutAdd ((do b <- readIORef board
-                  print $ validMoves $ playerA b
-                  print $ validMoves $ playerB b
-              ) >> return True) 5000
+  timeoutAdd (do b <- readIORef board
+                 cid <- statusbarGetContextId simStatusBar "Sim board status"
+                 statusbarPush simStatusBar cid $ statusBarText b
+                 return True
+             ) 100
 
   network <- compile $ do
     eNewGame <- event0 newGameImageMenuItem menuItemActivate
@@ -74,3 +79,17 @@ main = do
   actuate network
   widgetShowAll simWindow
   mainGUI
+
+statusBarText :: Board -> String
+statusBarText b =
+  case status b of
+    WinA -> pnA ++ " wins"
+    WinB -> pnB ++ " wins"
+    MoveA -> pnA ++ ": " ++ (show $ startVertices $ validMoves pA)
+    MoveB -> pnB ++ ": " ++ (show $ startVertices $ validMoves pB)
+    HalfMoveA v -> pnA ++ ": " ++ (show $ verticesToFrom v $ validMoves pA)
+    HalfMoveB v -> pnB ++ ": " ++ (show $ verticesToFrom v $ validMoves pB)
+  where pnA = T.unpack $ playerName pA
+        pnB = T.unpack $ playerName pB
+        pA = playerA b
+        pB = playerB b

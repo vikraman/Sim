@@ -3,6 +3,8 @@ module Sim.Game
        , gameLoop
        , initMoves
        , updateValidMoves
+       , startVertices
+       , verticesToFrom
        ) where
 
 import           Control.Monad.Trans (liftIO)
@@ -28,6 +30,29 @@ toMove v v' = if v < v'
 
 mkPlayer :: T.Text -> PlayerId -> PlayerType -> Player
 mkPlayer name pid pt = Player name pid pt [] initMoves
+
+startVertex :: Move -> Vertex
+startVertex (Line x _) = x
+
+endVertex :: Move -> Vertex
+endVertex (Line _ y) = y
+
+endVertices :: [Move] -> [Vertex]
+endVertices = nub . map endVertex
+
+startVertices :: [Move] -> [Vertex]
+startVertices ms = nub $ (map startVertex ms) `union` (map endVertex ms)
+
+verticesToFrom :: Vertex -> [Move] -> [Vertex]
+verticesToFrom v ms = delete v $ nub $ union p q
+  where p = startVertices moves
+        q = endVertices moves
+        moves = filter (\m -> startVertex m == v ||
+                              endVertex m == v
+                       ) ms
+
+endVerticesFrom :: Vertex -> [Move] -> [Vertex]
+endVerticesFrom v ms = nub . map endVertex $ filter (vertexFrom v) ms
 
 isValidMove :: Move -> Player -> Bool
 isValidMove = (. validMoves) . elem
