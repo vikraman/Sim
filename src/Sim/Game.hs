@@ -43,6 +43,10 @@ endVertices = nub . map endVertex
 startVertices :: [Move] -> [Vertex]
 startVertices ms = nub $ (map startVertex ms) `union` (map endVertex ms)
 
+vertexFrom :: Vertex -> Move -> Bool
+vertexFrom v (Line x y) | v == x = True
+                        | otherwise = False
+
 verticesToFrom :: Vertex -> [Move] -> [Vertex]
 verticesToFrom v ms = delete v $ nub $ union p q
   where p = startVertices moves
