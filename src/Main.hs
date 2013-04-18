@@ -28,7 +28,6 @@ main = do
   getDataFileName "src/sim.glade" >>= builderAddFromFile builder
 
   simWindow <- builderGetObject builder castToWindow "simWindow"
-  simWindow `on` deleteEvent $ liftIO mainQuit >> return False
 
   simNewDialog <- builderGetObject builder castToDialog "simNewDialog"
   newGameImageMenuItem <- builderGetObject builder castToMenuItem "newGameImageMenuItem"
@@ -72,6 +71,7 @@ main = do
     eNewGame <- event0 newGameImageMenuItem menuItemActivate
     eQuitGame <- event0 quitGameImageMenuItem menuItemActivate
     eAboutGame <- event0 aboutHelpImageMenuItem menuItemActivate
+    eDeleted <- eventM simWindow deleteEvent $ tryEvent $ liftIO mainQuit
 
     reactimate $ void (dialogRun simNewDialog) <$ eNewGame
     reactimate $ mainQuit <$ eQuitGame
