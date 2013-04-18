@@ -41,7 +41,7 @@ endVertices :: [Move] -> [Vertex]
 endVertices = nub . map endVertex
 
 startVertices :: [Move] -> [Vertex]
-startVertices ms = nub $ (map startVertex ms) `union` (map endVertex ms)
+startVertices ms = nub $ map startVertex ms `union` map endVertex ms
 
 vertexFrom :: Vertex -> Move -> Bool
 vertexFrom v (Line x y) | v == x = True

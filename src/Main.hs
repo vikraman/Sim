@@ -83,12 +83,12 @@ main = do
 statusBarText :: Board -> String
 statusBarText b =
   case status b of
-    WinA -> pnA ++ " wins"
-    WinB -> pnB ++ " wins"
-    MoveA -> pnA ++ ": " ++ (show $ startVertices $ validMoves pA)
-    MoveB -> pnB ++ ": " ++ (show $ startVertices $ validMoves pB)
-    HalfMoveA v -> pnA ++ ": " ++ (show $ verticesToFrom v $ validMoves pA)
-    HalfMoveB v -> pnB ++ ": " ++ (show $ verticesToFrom v $ validMoves pB)
+    WinA -> pnA ++ " wins!"
+    WinB -> pnB ++ " wins!"
+    MoveA -> pnA ++ ": " ++ show (startVertices $ validMoves pA)
+    MoveB -> pnB ++ ": " ++ show (startVertices $ validMoves pB)
+    HalfMoveA v -> pnA ++ ": " ++ show (verticesToFrom v $ validMoves pA)
+    HalfMoveB v -> pnB ++ ": " ++ show (verticesToFrom v $ validMoves pB)
   where pnA = T.unpack $ playerName pA
         pnB = T.unpack $ playerName pB
         pA = playerA b
