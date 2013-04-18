@@ -19,3 +19,14 @@ executable sim
                , cairo
                , reactive-banana == 0.7.*
                , reactive-banana-gtk == 0.0.2
+
+test-suite sim-tests
+  type: exitcode-stdio-1.0
+  hs-source-dirs: src
+  main-is: Tests.hs
+  build-depends: base == 4.*
+               , HUnit
+               , text
+               , mtl
+               , gtk
+               , cairo
