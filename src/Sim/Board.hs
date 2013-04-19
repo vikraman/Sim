@@ -12,7 +12,8 @@ radius :: Double
 radius = 150
 
 theta :: Double
-theta = pi/3
+theta = (2*pi)/n
+  where n = fromIntegral $ length $ enumFrom One
 
 vertex :: Dim -> Int -> Dim
 vertex (w, h) x = (w/2 + radius*sin (x'*theta), h/2 + radius*cos (x'*theta))
