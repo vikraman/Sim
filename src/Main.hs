@@ -53,7 +53,8 @@ main = do
                                              drawBoard (fromIntegral w, fromIntegral h)
                                            simFrame `on` keyPressEvent $
                                              do key <- eventKeyName
-                                                when (elem key $ map show [1..6]) $
+                                                let allowedKeys = map (show . (+1) . fromEnum) $ enumFrom One
+                                                when (elem key allowedKeys) $
                                                   do let v = toEnum ((read key :: Int) - 1) :: Vertex
                                                      board' <- liftIO $ readIORef board
                                                      board'' <- liftIO $ gameLoop simCanvas v board'
