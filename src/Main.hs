@@ -72,11 +72,12 @@ main = do
     eNewGame <- event0 newGameImageMenuItem menuItemActivate
     eQuitGame <- event0 quitGameImageMenuItem menuItemActivate
     eAboutGame <- event0 aboutHelpImageMenuItem menuItemActivate
-    eDeleted <- eventM simWindow deleteEvent $ tryEvent $ liftIO mainQuit
+    eDeleted <- eventM simWindow deleteEvent eventSent
 
     reactimate $ void (dialogRun simNewDialog) <$ eNewGame
     reactimate $ mainQuit <$ eQuitGame
     reactimate $ void (dialogRun simAboutDialog) <$ eAboutGame
+    reactimate $ mainQuit <$ eDeleted
 
   actuate network
   widgetShowAll simWindow
